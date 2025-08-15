@@ -1,5 +1,6 @@
 package com.example.reposcribe.domain.usecase
 
+import com.example.reposcribe.domain.model.User
 import com.example.reposcribe.domain.repository.AuthRepository
 
 class SignUpUseCase(
@@ -7,7 +8,11 @@ class SignUpUseCase(
 ) {
     // Executes the signup process by delegating to AuthRepository
     //invoke is a keyword
-    suspend operator fun invoke(email: String, password: String, githubUsername: String): Result<Unit> {
+    suspend operator fun invoke(
+        email: String,
+        password: String,
+        githubUsername: String
+    ): Result<User> {
         return authRepository.signup(email, password, githubUsername)
     }
 }

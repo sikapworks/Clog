@@ -1,9 +1,8 @@
 package com.example.reposcribe.data.repository
 
+import com.example.reposcribe.data.remote.FirebaseAuthDataSource
+import com.example.reposcribe.domain.model.User
 import com.example.reposcribe.domain.repository.AuthRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 //This class knows HOW to actually sign up the user and save extra info
 //does not know about UI or business logic
@@ -11,30 +10,38 @@ import kotlinx.coroutines.tasks.await
 
 //implements AuthRepository from domain
 class AuthRepositoryImpl(
-    private val auth: FirebaseAuth,
-    private val db: FirebaseFirestore
-): AuthRepository {
+    private val ds: FirebaseAuthDataSource
+) : AuthRepository {
 
     override suspend fun signup(
         email: String,
         password: String,
         githubUsername: String
-    ): Result<Unit> {
-        return try {
-            //create a user in firebase auth
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-
-            // get the user's UID from firebase
-            val userId = result.user?.uid ?: return Result.failure(Exception("User ID is null"))
-
-            //store the github username in firestore under users/{uid}
-            db.collection("users").document(userId)
-                .set(mapOf("githubUsername" to githubUsername))
-                .await()
-            Result.success(Unit)
-        }
-        catch (e: Exception) {
-            Result.failure(e) // return the exception
-        }
+    ): Result<User> = runCatching {
+        val (uid, email) = ds.createUser(email, password, githubUsername)
+        User(uid = uid, email = email, githubUsername = githubUsername)
     }
+
+    override suspend fun login(
+        email: String,
+        password: String
+    ): Result<User> = runCatching {
+        val (uid, email) = ds.signIn(email, password)
+        val github = ds.fetchGithubUsername(uid)
+        User(uid = uid, email = email, githubUsername = github)
+    }
+
+    override suspend fun logOut() {
+        ds.signOut()
+    }
+
+    override suspend fun getCurrentUser(): User? {
+        val uid = ds.currentUid() ?: return null
+        val github = ds.fetchGithubUsername(uid)
+        // Email not directly available here; you can store it in FireStore or read from auth
+        return User(uid = uid, email = "", githubUsername = github)
+
+    }
+
+
 }

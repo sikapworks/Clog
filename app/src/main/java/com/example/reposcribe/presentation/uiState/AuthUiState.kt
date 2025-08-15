@@ -1,12 +1,10 @@
-package com.example.reposcribe.presentation.signup
+package com.example.reposcribe.presentation.uiState
 
-//Holds UI state
-
-data class SignUpUiState(
+data class AuthUiState(
     val email: String = "",
     val password: String = "",
     val githubUsername: String = "",
     val success: Boolean = false,
     val loading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
 )
