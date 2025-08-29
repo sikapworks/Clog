@@ -1,7 +1,10 @@
 package com.example.reposcribe.data.remote
 
+import androidx.compose.ui.tooling.data.SourceContext
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.firestoreSettings
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -32,11 +35,38 @@ class FirebaseAuthDataSource @Inject constructor(
     }
 
     suspend fun fetchGithubUsername(uid: String): String? {
-        val fetch = db.collection("users").document(uid).get().await()
-        return fetch.getString("githubUsername")
+        return try {
+            val doc = db.collection("users").document(uid)
+                .get(Source.CACHE)  // first try cache
+                .await()
+            if (doc.exists() && doc.getString("githubUsername") != null) {
+                doc.getString("githubUsername")!!
+            }
+            else {
+                //fallback to server if cache is empty
+                db.collection("users").document(uid)
+                    .get(Source.SERVER)
+                    .await()
+                    .getString("githubUsername") ?: ""
+            }
+        }
+        catch (e: Exception) {
+            e.message //fallback safely, avoid crash
+        }
+    }
+
+    suspend fun updateGithubUsername(uid: String, newUsername: String) {
+        val userDoc = db.collection("users").document(uid)
+        userDoc.update("githubUsername", newUsername).await()
+    }
+
+    fun checkIfUserLoggedIn(): Boolean {
+        return auth.currentUser != null
     }
 
     fun currentUid(): String? = auth.currentUser?.uid
 
     fun signOut() = auth.signOut()
+
+    fun fetchEmail(uid: String): String? = auth.currentUser?.email
 }

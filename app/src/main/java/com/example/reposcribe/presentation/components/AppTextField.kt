@@ -1,8 +1,9 @@
 package com.example.reposcribe.presentation.components
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,6 +23,7 @@ fun AppTextField(
         onValueChange = onValueChange,
         label = { label },
         modifier = modifier,
+        singleLine = true,
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )

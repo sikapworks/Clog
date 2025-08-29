@@ -8,4 +8,7 @@ interface AuthRepository {
     suspend fun login(email: String, password: String): Result<User>
     suspend fun logOut()
     suspend fun getCurrentUser(): User?
+    fun checkIfUserLoggedIn(): Boolean
+    suspend fun updateGithubUsername(uid: String, newUsername: String)
+
 }

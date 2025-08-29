@@ -1,5 +1,6 @@
 package com.example.reposcribe.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,14 +39,20 @@ fun LoginScreen(
         }
     }
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.onPrimary)
     ) {
         Column(
             modifier = Modifier
                 .padding(20.dp)
                 .align(Alignment.Center)
         ) {
-            Text("Welcome back!", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Welcome back!",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+                )
             Spacer(Modifier.height(16.dp))
 
             // Email

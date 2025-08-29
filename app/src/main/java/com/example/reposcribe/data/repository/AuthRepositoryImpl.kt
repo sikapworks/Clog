@@ -37,11 +37,16 @@ class AuthRepositoryImpl(
 
     override suspend fun getCurrentUser(): User? {
         val uid = ds.currentUid() ?: return null
-        val github = ds.fetchGithubUsername(uid)
-        // Email not directly available here; you can store it in FireStore or read from auth
-        return User(uid = uid, email = "", githubUsername = github)
-
+        val github = ds.fetchGithubUsername(uid)  //now safe, offline handled
+        val email = ds.fetchEmail(uid) ?: return null// Email not directly available here; you can store it in FireStore or read from auth
+        return User(uid = uid, email = email, githubUsername = github)
     }
 
+    override fun checkIfUserLoggedIn(): Boolean {
+        return ds.checkIfUserLoggedIn()
+    }
 
+    override suspend fun updateGithubUsername(uid: String, newUsername: String) {
+        ds.updateGithubUsername(uid, newUsername)
+    }
 }

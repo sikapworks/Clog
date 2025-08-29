@@ -2,6 +2,11 @@
 <resources>
 
     <style name="Theme.RepoScribe" parent="android:Theme.Material.Light.NoActionBar">
-    <item name="android:windowBackground">@color/black</item>
+<!--    <item name="android:windowBackground">@co</item>-->
+    </style>
+
+    <!--Splash theme-->
+    <style name="Theme.RepoScribe.Splash" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
     </style>
 </resources>

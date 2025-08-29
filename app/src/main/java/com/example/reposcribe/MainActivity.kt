@@ -4,10 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.reposcribe.presentation.components.AppTextField
-import com.example.reposcribe.presentation.screens.LoginScreen
-import com.example.reposcribe.presentation.screens.SignUpScreen
-import com.example.reposcribe.ui.theme.RepoScribeTheme
+import com.example.compose.RepoScribeTheme
+import com.example.reposcribe.navigation.AppNavHost
+import com.example.reposcribe.presentation.screens.DashboardScreen
+import com.example.reposcribe.presentation.screens.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,8 +17,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RepoScribeTheme {
-                App()
-//                LoginScreen(onSuccess = {}, onGoToSignup = {})
+//                AppNavHost()
+                SettingsScreen(onLogout = {})
             }
         }
     }
