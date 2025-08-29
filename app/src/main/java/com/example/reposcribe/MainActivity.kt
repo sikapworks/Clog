@@ -1,4 +1,4 @@
-package com.example.reposcribe
+-m package com.example.reposcribe
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
