@@ -1,5 +1,6 @@
 package com.example.reposcribe.presentation.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,7 +46,7 @@ class DashboardViewModel @Inject constructor(
             try {
                 val user = getCurrentUser()
                 if (user == null) {
-                    _uiState.value = FetchRepoState.Error("No logged in user.")
+                    _uiState.value = FetchRepoState.Success(emptyList())
                     return@launch      //?
                 }
                 githubUsername = user.githubUsername
@@ -69,12 +70,39 @@ class DashboardViewModel @Inject constructor(
 
     fun refresh() = loadRepos()
 
+    fun connectRepo(owner: String, name: String) {
+        viewModelScope.launch {
+            val user = getCurrentUser()
+            if (user == null) {
+                _uiState.value = FetchRepoState.Error("No logged in user.")
+                return@launch
+            }
+            try {
+//                verify repo exists on GitHub
+                val details = getRepoDetails(owner, name)  // calls API
+
+//              save into firestore
+                val connectedRepo = ConnectedRepo(owner, name)
+                addConnectedRepo(user.uid, connectedRepo)
+
+                // reload repos
+                loadRepos()
+
+                Log.d("DashboardVM", "Repo connected: ${connectedRepo.repoId}")
+            } catch (e: Exception) {
+                Log.e("DashboardVM", "Failed to connect repo", e)
+                _uiState.value = FetchRepoState.Error("Failed to connect: ${e.message}")
+            }
+        }
+    }
+
+
     fun addRepo(repo: ConnectedRepo) {
         viewModelScope.launch {
             val user = getCurrentUser()
             if (user != null) {
-                addConnectedRepo(user.uid, repo)
-                loadRepos()
+                addConnectedRepo(user.uid, repo)  // writes to firestore
+                loadRepos()   //reload repos
             }
         }
     }

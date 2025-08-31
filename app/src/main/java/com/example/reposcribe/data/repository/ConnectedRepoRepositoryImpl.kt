@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class ConnectedRepoRepositoryImpl @Inject constructor(
     private val firestore: FireStoreDataSource
 ): ConnectedRepoRepository {
-    override suspend fun getConnectedRepo(userId: String): List<ConnectedRepo> {
+    override suspend fun getConnectedRepos(userId: String): List<ConnectedRepo> {
         return firestore.getConnectedRepo(userId)
     }
 

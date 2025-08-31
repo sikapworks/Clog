@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.compose.RepoScribeTheme
 import com.example.reposcribe.navigation.AppNavHost
-import com.example.reposcribe.presentation.screens.DashboardScreen
 import com.example.reposcribe.presentation.screens.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,8 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RepoScribeTheme {
-//                AppNavHost()
-                SettingsScreen(onLogout = {})
+                AppNavHost()
+//                SettingsScreen(onLogout = {})
             }
         }
     }

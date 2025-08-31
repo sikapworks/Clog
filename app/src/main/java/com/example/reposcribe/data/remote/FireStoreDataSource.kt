@@ -14,13 +14,13 @@ class FireStoreDataSource @Inject constructor(
     private val usersCollection = firestore.collection("users")
 
     suspend fun getConnectedRepo(userId: String): List<ConnectedRepo> {
-        val doc = usersCollection
+        val snapshot = usersCollection
             .document(userId)
             .collection("connectedRepos")
             .get()
             .await()
 
-        return doc.documents.mapNotNull { it.toObject(ConnectedRepo::class.java) }    //???
+        return snapshot.documents.mapNotNull { it.toObject(ConnectedRepo::class.java) }    //???
     }
     suspend fun addConnectedRepo(userId: String, repo: ConnectedRepo) {
         usersCollection

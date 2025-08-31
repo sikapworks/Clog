@@ -1,5 +1,6 @@
 package com.example.reposcribe.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -58,8 +59,7 @@ fun AppNavHost(
             )
         }
 
-        composable(
-            "summary/{owner}/{name}",
+        composable("summary/{owner}/{name}",
             arguments = listOf(
                 navArgument("owner") { type = NavType.StringType },
                 navArgument("name") { type = NavType.StringType }
@@ -67,11 +67,13 @@ fun AppNavHost(
         ) { backStack ->
             val owner = backStack.arguments?.getString("owner")!!
             val name = backStack.arguments?.getString("name")!!
-            SummaryScreen(owner = owner, repo = name, onBack = { navController.popBackStack() })
+            val userId = backStack.arguments?.getString("userId")!!
+            Log.d("NavGraph", "Navigated to summary with $owner/$name")
+            SummaryScreen(owner = owner, repo = name, userId, onBack = { navController.popBackStack() })
         }
 
         composable("settings") {
-            SettingsScreen(onLogout = { navController.popBackStack() })
+            SettingsScreen(onLogout = { navController.navigate("login") })
         }
     }
 }

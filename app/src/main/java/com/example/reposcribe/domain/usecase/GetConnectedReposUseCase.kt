@@ -8,6 +8,6 @@ class GetConnectedReposUseCase @Inject constructor(
     private val repo: ConnectedRepoRepository
 ) {
     suspend operator fun invoke(userId: String): List<ConnectedRepo> {
-        return repo.getConnectedRepo(userId)
+        return repo.getConnectedRepos(userId)
     }
 }

@@ -27,6 +27,7 @@ class GithubRepositoryImpl @Inject constructor(
         sinceIso: String,
         untilIso: String
     ): List<Commit> {
+        Log.d("GithubRepository", "Calling API for $owner/$repo since=$sinceIso until=$untilIso")
         val response = apiService.getCommitsForRange(owner, repo, sinceIso, untilIso)
         Log.d("GithubRepository", "Fetched commits: ${response.size}")
         response.forEach {

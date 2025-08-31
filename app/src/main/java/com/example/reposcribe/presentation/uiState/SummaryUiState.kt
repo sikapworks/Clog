@@ -11,3 +11,9 @@ data class WeeklySummaryUi (
     val contributorsCount: Int,
     val sections: List<SummarySectionUi>
 )
+
+data class SummaryUiState(
+    val isLoading: Boolean = false,
+    val summary: String? = null,
+    val error: String? = null
+)

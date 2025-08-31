@@ -20,9 +20,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.reposcribe.domain.model.ConnectedRepo
+import com.example.reposcribe.presentation.components.ConnectRepoDialog
 import com.example.reposcribe.presentation.components.EmptyState
 import com.example.reposcribe.presentation.components.ErrorState
 import com.example.reposcribe.presentation.components.RepoRow
@@ -39,6 +45,7 @@ fun DashboardScreen(
 ) {
 //    val state = viewModel.uiState
     val state = viewModel.uiState.collectAsState().value
+    var showDialog by remember { mutableStateOf(false) }
 
     //diff btw by and =
     val refreshing = state is FetchRepoState.Loading
@@ -56,11 +63,12 @@ fun DashboardScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { TODO() }) {
+            FloatingActionButton(onClick = { showDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Connect Repo")
             }
         }
-    ) { padding ->
+    )
+    { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,7 +85,11 @@ fun DashboardScreen(
                             title = "No repositories yet",
                             subtitle = "Connect your first repo to start getting summaries",
                             actionText = "Connect Repo",
-                            onAction = { TODO() }
+                            onAction = {
+                                viewModel.addRepo(
+                                    ConnectedRepo.from("sikapworks", "RepoScribe")
+                                )
+                            }
                         )
                     } else {
                         LazyColumn(
@@ -103,4 +115,15 @@ fun DashboardScreen(
         }
 
     }
+    if (showDialog) {
+        ConnectRepoDialog(
+            onDismiss = { showDialog = false },
+            onConfirm = { owner, name ->
+//                val repo = ConnectedRepo.from(owner, name)
+                viewModel.connectRepo(owner, name)
+                showDialog = false
+            }
+        )
+    }
+
 }
