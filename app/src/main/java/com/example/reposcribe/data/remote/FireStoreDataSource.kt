@@ -1,7 +1,8 @@
 package com.example.reposcribe.data.remote
 
 import com.example.reposcribe.domain.model.ConnectedRepo
-import com.google.firebase.Firebase
+import com.example.reposcribe.domain.model.User
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -16,36 +17,38 @@ class FireStoreDataSource @Inject constructor(
     suspend fun getConnectedRepo(userId: String): List<ConnectedRepo> {
         val snapshot = usersCollection
             .document(userId)
-            .collection("connectedRepos")
             .get()
             .await()
-
-        return snapshot.documents.mapNotNull { it.toObject(ConnectedRepo::class.java) }    //???
+        val user = snapshot.toObject(User::class.java)
+        return user?.connectedRepos ?: emptyList()
     }
+
     suspend fun addConnectedRepo(userId: String, repo: ConnectedRepo) {
         usersCollection
             .document(userId)
-            .collection("connectedRepos")
-            .document(repo.repoId)
-            .set(repo)
+            .update("connectedRepos", FieldValue.arrayUnion(repo))
             .await()
     }
+
     suspend fun removeConnectedRepo(userId: String, repoId: String) {
-        usersCollection
+        val snapshot = usersCollection
             .document(userId)
-            .collection("connectedRepos")
-            .document(repoId)
-            .delete()
-            .await()
-    }
-    suspend fun isRepoConnected(userId: String, repoId: String): Boolean {
-        val doc = usersCollection
-            .document(userId)
-            .collection("connectedRepos")
-            .document(repoId)
             .get()
             .await()
+        val user = snapshot.toObject(User::class.java)
+        val currentRepos = user?.connectedRepos ?: emptyList()
 
-        return doc.exists()
+        val toRemove = currentRepos.find { it.repoId == repoId }
+        if(toRemove != null) {
+            usersCollection
+                .document(userId)
+                .update("connectedRepos", FieldValue.arrayRemove(toRemove))
+                .await()
+        }
+    }
+
+    suspend fun isRepoConnected(userId: String, repoId: String): Boolean {
+        val repos = getConnectedRepo(userId)
+        return repos.any { it.repoId == repoId }
     }
 }

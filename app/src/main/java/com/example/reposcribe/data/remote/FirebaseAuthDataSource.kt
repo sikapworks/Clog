@@ -1,6 +1,7 @@
 package com.example.reposcribe.data.remote
 
 import androidx.compose.ui.tooling.data.SourceContext
+import com.example.reposcribe.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -58,6 +59,13 @@ class FirebaseAuthDataSource @Inject constructor(
     suspend fun updateGithubUsername(uid: String, newUsername: String) {
         val userDoc = db.collection("users").document(uid)
         userDoc.update("githubUsername", newUsername).await()
+    }
+
+    suspend fun saveUser(user: User) {
+        db.collection("users")
+            .document(user.uid)
+            .set(user)
+            .await()
     }
 
     fun checkIfUserLoggedIn(): Boolean {

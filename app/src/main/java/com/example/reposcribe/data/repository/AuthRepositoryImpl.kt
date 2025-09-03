@@ -19,7 +19,9 @@ class AuthRepositoryImpl(
         githubUsername: String
     ): Result<User> = runCatching {
         val (uid, email) = ds.createUser(email, password, githubUsername)
-        User(uid = uid, email = email, githubUsername = githubUsername)
+        val user = User(uid = uid, email = email, githubUsername = githubUsername, connectedRepos = emptyList())
+        ds.saveUser(user)
+        user
     }
 
     override suspend fun login(
