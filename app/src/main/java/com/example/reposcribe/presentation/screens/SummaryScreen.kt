@@ -3,6 +3,7 @@ package com.example.reposcribe.presentation.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,12 +25,17 @@ fun SummaryScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(owner, repo) {
-        viewModel.loadCommits(owner, repo)
+        viewModel.loadCommits(owner, repo, true)
         viewModel.loadSummary("Summarize the weekly activity of repo $repo owned by $owner.")  // call Ai summary
     }
 
     Column {
         Text(text = "Summary for $owner/$repo")
+
+        Button(onClick = {viewModel.refresh(owner, repo)}) {
+            Text("Refresh")
+        }
+
         when {
             uiState.isLoading -> Text("Loading...")
             uiState.isFetchingCommits -> Text("Fetching commits, this may take a while.")

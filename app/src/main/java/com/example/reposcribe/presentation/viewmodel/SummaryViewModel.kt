@@ -28,27 +28,38 @@ class SummaryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SummaryUiState())
     val uiState: StateFlow<SummaryUiState> = _uiState
 
+    private var isCommitsLoaded = false
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadCommits(owner: String, repo: String) {
+    fun loadCommits(owner: String, repo: String, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                _uiState.value = SummaryUiState(isLoading = true)
+                _uiState.value = SummaryUiState(isLoading = forceRefresh)
                 Log.d("SummaryVM", "Fetching commits for $owner/$repo")
-                val data = getWeeklyCommits(owner, repo)
-                _commits.value = data
+                val result = getWeeklyCommits(owner, repo)
+                _commits.value = result
+                isCommitsLoaded = forceRefresh
+
                 _uiState.value = _uiState.value.copy(isLoading = false)
-                Log.d("SummaryVM", "Got ${data.size} commits")
+                Log.d("SummaryVM", "Got ${result.size} commits")
+
             } catch (e: Exception) {
                 Log.e("SummaryVM", "Error fetching commits", e)
-                _uiState.value = SummaryUiState(error = e.message ?: "Error fetching commits")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun refresh(owner: String, repo: String) {
+        loadCommits(owner, repo, forceRefresh = true)
+        loadSummary("Summarize weekly activity for repo $repo owned by $owner.")
     }
 
     fun loadSummary(prompt: String) {
         viewModelScope.launch {
             try {
-                _uiState.value = SummaryUiState(isLoading = true)
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
                 val request = PromptRequest(
                     contents = listOf(
@@ -62,11 +73,12 @@ class SummaryViewModel @Inject constructor(
                 )
                 Log.d("SummaryVM", "Fetching summary with prompt: $prompt")
 
-                val response = getRepoSummary(request)
-                _uiState.value = SummaryUiState(summary = response.summary)
+                val summary = getRepoSummary(request)
+                _uiState.value = _uiState.value.copy(isLoading = false, summary = summary.toString())
+
             } catch (e: Exception) {
                 Log.e("SummaryVM", "Error fetching summary", e)
-                _uiState.value = SummaryUiState(error = e.message ?: "Error fetching summary")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
         }
     }
