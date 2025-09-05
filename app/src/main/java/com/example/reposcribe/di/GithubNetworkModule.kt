@@ -79,9 +79,9 @@ object GithubNetworkModule {
         return ConnectedRepoRepositoryImpl(firestore)
     }
 
-    @Provides
-    @Singleton
-    fun provideGetReposUseCase(githubRepository: GithubRepository) = GetReposUseCase(githubRepository)
+//    @Provides
+//    @Singleton
+//    fun provideGetReposUseCase(githubRepository: GithubRepository) = GetReposUseCase(githubRepository)
 
 //    @Provides
 //    @Singleton

@@ -16,7 +16,7 @@ import com.example.reposcribe.presentation.viewmodel.SummaryViewModel
 fun SummaryScreen(
     owner: String,
     repo: String,
-    userId: String,
+//    userId: String,
     onBack: () -> Unit,
     viewModel: SummaryViewModel = hiltViewModel()
 ) {
@@ -32,6 +32,7 @@ fun SummaryScreen(
         Text(text = "Summary for $owner/$repo")
         when {
             uiState.isLoading -> Text("Loading...")
+            uiState.isFetchingCommits -> Text("Fetching commits, this may take a while.")
             uiState.error != null -> Text("Error: ${uiState.error}")
             uiState.summary != null -> Text("AI Summary:\n${uiState.summary}")
         }

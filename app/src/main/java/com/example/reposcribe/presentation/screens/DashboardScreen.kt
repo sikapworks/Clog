@@ -1,5 +1,7 @@
 package com.example.reposcribe.presentation.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,20 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.reposcribe.domain.model.ConnectedRepo
 import com.example.reposcribe.presentation.components.ConnectRepoDialog
 import com.example.reposcribe.presentation.components.EmptyState
 import com.example.reposcribe.presentation.components.ErrorState
 import com.example.reposcribe.presentation.components.RepoRow
 import com.example.reposcribe.presentation.components.RepoSkeleton
+import com.example.reposcribe.presentation.uiState.CommitFetchState
 import com.example.reposcribe.presentation.uiState.FetchRepoState
 import com.example.reposcribe.presentation.viewmodel.DashboardViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
@@ -45,7 +48,9 @@ fun DashboardScreen(
 ) {
 //    val state = viewModel.uiState
     val state = viewModel.uiState.collectAsState().value
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    val availableRepos = viewModel.availableRepos.collectAsState().value
+    val commitState = viewModel.commitState.collectAsState().value
 
     //diff btw by and =
     val refreshing = state is FetchRepoState.Loading
@@ -63,7 +68,10 @@ fun DashboardScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }) {
+            FloatingActionButton(onClick = {
+                viewModel.loadAvailableRepos()
+                showDialog = true
+            }) {
                 Icon(Icons.Default.Add, contentDescription = "Connect Repo")
             }
         }
@@ -86,9 +94,8 @@ fun DashboardScreen(
                             subtitle = "Connect your first repo to start getting summaries",
                             actionText = "Connect Repo",
                             onAction = {
-                                viewModel.addRepo(
-                                    ConnectedRepo.from("sikapworks", "RepoScribe")
-                                )
+                                viewModel.loadAvailableRepos()
+                                showDialog = true
                             }
                         )
                     } else {
@@ -113,17 +120,31 @@ fun DashboardScreen(
             }
 //            PullRefreshIndicator(refreshing, refreshState, Modifier.align(Alignment.TopCenter))
         }
-
     }
     if (showDialog) {
         ConnectRepoDialog(
+            repos = availableRepos,
             onDismiss = { showDialog = false },
-            onConfirm = { owner, name ->
-//                val repo = ConnectedRepo.from(owner, name)
-                viewModel.connectRepo(owner, name)
+            onConfirm = { repo ->
+                val owner = viewModel.githubUsername ?: return@ConnectRepoDialog
+                viewModel.connectRepo(owner, repo.name)
                 showDialog = false
             }
         )
     }
+    when (commitState) {
+        is CommitFetchState.Loading -> {
+            Text("Fetching commits... This may take a while.")
+        }
 
+        is CommitFetchState.Error -> {
+            ErrorState(commitState.message, onRetry = { TODO() })
+        }
+
+        is CommitFetchState.Success -> {
+            Text("Fetched ${commitState.commitCount} commits successfully")
+        }
+
+        else -> Unit
+    }
 }

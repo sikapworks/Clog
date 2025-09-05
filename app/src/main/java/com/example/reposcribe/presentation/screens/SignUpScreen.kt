@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.reposcribe.presentation.components.AppTextField
@@ -62,7 +63,8 @@ fun SignUpScreen(
                 value = state.githubUsername,
                 onValueChange = viewModel::onGithubUsernameChanged,
                 label = "Github Username",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                imeAction = ImeAction.Done
             )
             Spacer(Modifier.height(16.dp))
 

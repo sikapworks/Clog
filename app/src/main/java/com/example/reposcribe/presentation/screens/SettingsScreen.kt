@@ -1,10 +1,14 @@
 package com.example.reposcribe.presentation.screens
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.savedstate.savedState
 import com.example.compose.RepoScribeTheme
 import com.example.reposcribe.presentation.components.ProfileCard
 import com.example.reposcribe.presentation.components.SettingsOption
@@ -29,6 +34,7 @@ fun SettingsScreen(
     onLogout: () -> Unit
 ) {
     val user = viewModel.user.collectAsState().value
+    val scrollableState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -39,11 +45,15 @@ fun SettingsScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
+                .scrollable(
+                    state = scrollableState,
+                    orientation = Orientation.Vertical
+                )
         ) {
-            if (user != null || user == null) {
+            if (user != null) {
                 ProfileCard(
-                    username = user?.githubUsername.toString() ?: "sikap",
-                    email = user?.email ?: "ksiya1306@gmail.com"
+                    username = user.githubUsername.toString(),
+                    email = user.email.toString()
                 )
             }
 

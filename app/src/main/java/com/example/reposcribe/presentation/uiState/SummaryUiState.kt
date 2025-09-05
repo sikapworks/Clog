@@ -14,6 +14,7 @@ data class WeeklySummaryUi (
 
 data class SummaryUiState(
     val isLoading: Boolean = false,
+    val isFetchingCommits: Boolean = false,
     val summary: String? = null,
     val error: String? = null
 )
