@@ -51,7 +51,7 @@ class SummaryViewModel @Inject constructor(
                     if (cached != null) {
                         val summary =
                             Gson().fromJson(cached.summaryText, PromptResponse::class.java)
-                        _uiState.value = _uiState.value.copy(summary = summary)
+                        _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
                     } else {
                         loadSummary(owner, repo, fetchedCommits)
                     }

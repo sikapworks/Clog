@@ -1,6 +1,7 @@
 package com.example.reposcribe.data.repository
 
 import android.util.Log
+import com.example.reposcribe.BuildConfig
 import com.example.reposcribe.data.remote.AiApiService
 import com.example.reposcribe.data.remote.dto.AiSummaryRequest
 import com.example.reposcribe.data.remote.dto.Content
@@ -17,11 +18,11 @@ class AiRepositoryImpl @Inject constructor(
     private val apiService: AiApiService
 ) : AiRepository {
 
-    private val apiKey = "AIzaSyBe6C5oXOpM8YZhV8sbnNJkOKnEImRKsMo"
+    private val apiKey = BuildConfig.API_KEY
 
-    init {
-        Log.d("AiRepositoryImpl", "Loaded API key: $apiKey")
-    }
+//    init {
+//        Log.d("AiRepositoryImpl", "Load api key $apiKey")
+//    }
 
     override suspend fun getSummary(request: PromptRequest): PromptResponse {
 
@@ -29,30 +30,40 @@ class AiRepositoryImpl @Inject constructor(
         val aiRequest = AiSummaryRequest(
             contents = request.contents.map { content ->
                 Content(
-                    role = content.role,
-                    parts = content.parts.map { Part(text = it.text) }
+                    role = "user",
+                    parts = listOf(Part(text = "Say hello in JSON."))
+//                    role = content.role,
+//                    parts = content.parts.map { Part(text = it.text) }
                 )
             },
-            generationConfig = GenerationConfig(responseMineType = "application/json")
+//            generationConfig = GenerationConfig(responseMineType = "application/json")
         )
 
         //call API
         val response = apiService.getSummary(
             model = "gemini-2.0-flash",
-            apiKey = "API_KEY",
+            apiKey = apiKey,
             request = aiRequest
         )
+        Log.d("AiRepositoryImpl", "Full response: ${Gson().toJson(response)}")
+
 
         //map dto -> domain
         val summaryText = response.candidates
             .firstOrNull()
             ?.content?.parts?.firstOrNull()?.text
             ?: "No response"
+        Log.d("AiRepositoryImpl", "Raw AI response: $summaryText")
 
         return try {
-            Gson().fromJson(summaryText, PromptResponse::class.java)
+            val json = summaryText.substringAfter("{").substringBeforeLast("}")
+            val cleanJson = "{$json}"
+            val parsed = Gson().fromJson(cleanJson, PromptResponse::class.java)
+            return parsed
         } catch (e: Exception) {
             PromptResponse()  //fallback empty
         }
+//        Log.d("AiRepositoryImpl", "Raw AI response: $summaryText")
+
     }
 }

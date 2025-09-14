@@ -3,6 +3,7 @@ package com.example.reposcribe.data.remote
 import com.example.reposcribe.data.remote.dto.CommitListItemDto
 import com.example.reposcribe.data.remote.dto.RepositoryDto
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -18,7 +19,8 @@ interface GithubApiService {
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Query("since") sinceIso: String,
-        @Query("until") untilIso: String
+        @Query("until") untilIso: String,
+        @Header("Authorization") authHeader: String? = null
     ): List<CommitListItemDto>
 
     @GET("repos/{owner}/{repo}")

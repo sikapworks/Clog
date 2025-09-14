@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class AiSummaryRequest(
     val contents: List<Content>,
-    val generationConfig: GenerationConfig? = null
+//    val generationConfig: GenerationConfig? = null
 )
 
 data class Content(
@@ -17,5 +17,5 @@ data class Part(
 )
 
 data class GenerationConfig(
-    @SerializedName("response_mine_type") val responseMineType: String? = null
+    @SerializedName("responseMineType") val responseMineType: String? = null
 )

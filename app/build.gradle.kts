@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,6 +12,16 @@ android {
     namespace = "com.example.reposcribe"
     compileSdk = 35
 
+    val localProperties = Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) {
+            file.inputStream().use { load(it) }
+        }
+    }
+
+    val githubToken: String = localProperties.getProperty("GITHUB_TOKEN", "")
+    val apiKey: String = localProperties.getProperty("API_KEY", "")
+
     defaultConfig {
         applicationId = "com.example.reposcribe"
         minSdk = 24
@@ -18,13 +29,10 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        val apiKey: String = project.findProperty("API_KEY") as String? ?: ""
-        buildConfigField(
-            "String",
-            "API_KEY",
-            "\"$apiKey\""
-        )
+        buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {

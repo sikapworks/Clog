@@ -3,6 +3,7 @@ package com.example.reposcribe.data.repository
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.reposcribe.BuildConfig
 import com.example.reposcribe.data.mapper.toDomain
 import com.example.reposcribe.data.remote.GithubApiService
 import com.example.reposcribe.domain.model.Commit
@@ -27,11 +28,14 @@ class GithubRepositoryImpl @Inject constructor(
         sinceIso: String,
         untilIso: String
     ): List<Commit> {
-        Log.d("GithubRepository", "Calling API for $owner/$repo since=$sinceIso until=$untilIso")
-        val response = apiService.getCommitsForRange(owner, repo, sinceIso, untilIso)
+//        Log.d("GithubRepository", "Calling API for $owner/$repo since=$sinceIso until=$untilIso")
+
+        val authHeader = "token ${BuildConfig.GITHUB_TOKEN}"
+//        Log.d("AiRepositoryImpl", "Load api key $authHeader")
+        val response = apiService.getCommitsForRange(owner, repo, sinceIso, untilIso, authHeader)
         Log.d("GithubRepository", "Fetched commits: ${response.size}")
         response.forEach {
-            Log.d("GithubRepository", "commit message: ${it.commit.message}")
+//            Log.d("GithubRepository", "commit message: ${it.commit.message}")
         }
         return response.map { it.toDomain() }
     }
