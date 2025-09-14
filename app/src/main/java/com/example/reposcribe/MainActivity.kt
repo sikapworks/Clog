@@ -15,6 +15,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("KeysCheck", "API_KEY: ${BuildConfig.API_KEY.take(5)}..., GITHUB_TOKEN: ${BuildConfig.GITHUB_TOKEN.take(5)}...")
 
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
