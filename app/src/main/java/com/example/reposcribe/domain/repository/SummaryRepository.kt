@@ -21,7 +21,7 @@ class SummaryRepository @Inject constructor(
         summaryDao.insertSummary(summary)
     }
 
-    suspend fun cleanupOdlSummaries(olderThanTimestamp: Long) {
+    suspend fun cleanupOldSummaries(olderThanTimestamp: Long) {
         summaryDao.deleteOldSummaries(olderThanTimestamp)
     }
 }

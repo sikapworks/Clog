@@ -44,8 +44,18 @@ class SummaryViewModel @Inject constructor(
 
             try {
                 val fetchedCommits = getWeeklyCommits(owner, repo)
-                Log.d("SummaryVM", "Fetched commits size=${fetchedCommits.size}")
-                _commits.value = fetchedCommits
+
+                // filter commits to last 7 days
+                val now = LocalDate.now()
+                val weekAgo = now.minusDays(6)
+                val filtered = fetchedCommits.filter { commit ->
+                    commit.dateIso?.let { LocalDate.parse(it.substring(0, 10)) }
+                        ?.isAfter(weekAgo.minusDays(1)) ?: false
+                }   // understanddd this
+
+                _commits.value = filtered
+                updateDerivedState(filtered, _uiState.value.summary)
+
                 _uiState.value = _uiState.value.copy(isFetchingCommits = false)
 
                 if (fetchSummary) {
@@ -54,17 +64,18 @@ class SummaryViewModel @Inject constructor(
                         val summary =
                             Gson().fromJson(cached.summaryText, PromptResponse::class.java)
                         _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
+                        updateDerivedState(filtered, summary)
                     } else {
                         loadSummary(owner, repo, fetchedCommits)
                     }
                 }
-
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isFetchingCommits = false,
                     error = e.message
                 )
             }
+            Log.d("SummaryVM", "loadCommits END for $owner/$repo")
         }
     }
 
@@ -76,6 +87,7 @@ class SummaryViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadSummary(owner: String, repo: String, commits: List<Commit>) {
         viewModelScope.launch {
+            Log.d("SummaryVM", "loadSummary START for $owner/$repo commits=${commits.size}")
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             try {
@@ -83,6 +95,8 @@ class SummaryViewModel @Inject constructor(
                     .toString() to LocalDate.now().toString())
                 val commitMessages = _commits.value.map { it.message }
                 val promptJson = builtCommitSummaryPrompt(repo, startDate, endDate, commitMessages)
+
+                Log.d("SummaryVM", "Prompt JSON: ${promptJson.take(1000)}")
 
                 val request = PromptRequest(
                     contents = listOf(
@@ -94,7 +108,7 @@ class SummaryViewModel @Inject constructor(
                         )
                     )
                 )
-                Log.d("SummaryVM", "Sending prompt: $promptJson")
+
                 val summary = getRepoSummary(request)
                 Log.d("SummaryVM", "AI summary response: $summary")
 
@@ -108,11 +122,31 @@ class SummaryViewModel @Inject constructor(
                 )
 
                 _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
+                Log.d("SummaryVM", "loadSummary SUCCESS for $owner/$repo")
 
             } catch (e: Exception) {
                 Log.e("SummaryVM", "Error fetching summary", e)
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateDerivedState(commits: List<Commit>, summary: PromptResponse?) {
+        val dates = commits.mapNotNull { it.dateIso?.substring(0, 10) }.sorted()
+        val period = if (dates.isNotEmpty()) "${dates.first()} - ${dates.last()}" else "N/A"
+
+        val contributorsCount =
+            commits.mapNotNull { it.authorName?.takeIf { it.isNotBlank() } }.toSet().size
+
+        val commitsCount = summary?.let {
+            it.newFeatures.size + it.improvements.size + it.bugFixes.size + it.documentation.size
+        } ?: 0
+
+        _uiState.value = _uiState.value.copy(
+            period = period,
+            contributorsCount = contributorsCount,
+            commitsCount = commitsCount
+        )
     }
 }

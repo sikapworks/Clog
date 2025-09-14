@@ -17,11 +17,13 @@ fun builtCommitSummaryPrompt(
           "task": "summarize_commits",
           "project": "$projectName",
           "time_range": "$startDate to $endDate",
-          "instructions": "Categorize commit messages into 4 sections: New Features, Improvements, Bug Fixes, and Documentation. 
-          Return JSON with keys: newFeatures, improvements, bugFixes, documentation. 
-          Each key should contain a list of short bullet points (strings). 
-          If a category has no commits, return an empty list for that key. 
-          Do not include extra text outside JSON.",
+          "instructions": "You are an assistant that converts short commit messages into clear, human-readable sentences. 
+          Categorize them into exactly 4 sections: newFeatures, improvements, bugFixes, documentation. 
+          - Expand short phrases into meaningful sentences but not too long (e.g., 'improved dashboard' → 'Improved the dashboard for better usability').
+          - Ignore meaningless or unclear commits (e.g., 'fix', 'update', 'changes').
+          - Do not invent features that are not mentioned.
+          - If a category has no valid commits, return an empty list [].
+          - Output must be valid JSON only, with keys: newFeatures, improvements, bugFixes, documentation.",
           "commits": $commitsJsonArray
         }
     """.trimIndent()
