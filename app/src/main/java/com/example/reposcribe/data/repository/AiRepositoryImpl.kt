@@ -30,14 +30,15 @@ class AiRepositoryImpl @Inject constructor(
         val aiRequest = AiSummaryRequest(
             contents = request.contents.map { content ->
                 Content(
-                    role = "user",
-                    parts = listOf(Part(text = "Say hello in JSON."))
-//                    role = content.role,
-//                    parts = content.parts.map { Part(text = it.text) }
+//                    role = "user",
+//                    parts = listOf(Part(text = "Say hello in JSON."))
+                    role = content.role,
+                    parts = content.parts.map { Part(text = it.text) }
                 )
             },
 //            generationConfig = GenerationConfig(responseMineType = "application/json")
         )
+
 
         //call API
         val response = apiService.getSummary(
@@ -63,7 +64,7 @@ class AiRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             PromptResponse()  //fallback empty
         }
-//        Log.d("AiRepositoryImpl", "Raw AI response: $summaryText")
+        Log.d("AiRepositoryImpl", "Raw AI response: $summaryText")
 
     }
 }
