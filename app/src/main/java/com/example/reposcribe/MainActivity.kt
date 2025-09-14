@@ -10,6 +10,7 @@ import com.example.reposcribe.navigation.AppNavHost
 import com.example.reposcribe.presentation.screens.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
