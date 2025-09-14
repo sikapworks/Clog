@@ -5,18 +5,19 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.compose.RepoScribeTheme
 import com.example.reposcribe.presentation.components.SummaryContent
 import com.example.reposcribe.presentation.viewmodel.SummaryViewModel
 
@@ -34,6 +35,10 @@ fun SummaryScreen(
 
     // trigger load once when opened
     LaunchedEffect(owner, repo) {
+        Log.d(
+            "SummaryScreen",
+            "Composed SummaryScreen owner=$owner repo=$repo uiStateSummaryPresent=${uiState.summary != null}"
+        )
         viewModel.loadCommits(owner, repo, fetchSummary = true)
     }
 
@@ -63,76 +68,29 @@ fun SummaryScreen(
         if (s.bugFixes.isNotEmpty()) categories["Bug Fixes"] = s.bugFixes
         if (s.documentation.isNotEmpty()) categories["Documentation"] = s.documentation
     }
-    if (categories.isEmpty()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("No summary available yet. Tap Refresh to generate.")
-            Button(onClick = { TODO() }) {
+
+    // UI rendering: if a summary exists show it; else friendly empty state
+    when {
+        uiState.isLoading || uiState.isFetchingCommits -> Text("Loading...")
+        uiState.error != null -> Text("Error: ${uiState.error}")
+        uiState.summary != null -> {
+            SummaryContent(
+                repoName = "$owner/$repo",
+                period = period,
+                commits = commitsCount,
+                contributors = contributorsCount,
+                categories = categories
+            )
+        }
+
+        else -> {
+            Column {
+                Text("No summary available yet. Tap Refresh to generate.")
+                Button(onClick = { viewModel.refresh(owner, repo) }) {
                 Text("Refresh")
+                }
             }
         }
-    } else {
-        SummaryContent(
-            repoName = "$owner/$repo",
-            period = period,
-            commits = commits.size,
-            contributors = contributorsCount,
-            categories = categories,
-            onShareClick = TODO(),
-            onExportClick = TODO(),
-        )
-    }
-
-    // debug
-    Log.d(
-        "SummaryRoute",
-        "owner=$owner repo=$repo commits=$commitsCount contributors=$contributorsCount period=$period"
-    )
-    Log.d(
-        "SummaryRoute",
-        "uiState.summary present=${uiState.summary != null}, categories=${categories.keys}"
-    )
-//        if (commits.isNotEmpty()) {
-//            Text("Commits this week:")
-//            commits.forEach { commit ->
-//                Text("-----> ${commit.message}")
-//            }
-//        }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSummaryScreen() {
-    val fakeCategories = linkedMapOf(
-        "New Features" to listOf("Dark mode added", "New dashboard screen"),
-        "Bug Fixes" to listOf(
-            "Fixed crash on login",
-            "Resolved API timeout",
-            "Dark mode added",
-            "New dashboard screen",
-            "Fixed crash on login",
-            "Resolved API timeout",
-            "Dark mode added",
-            "New dashboard screen",
-            "Fixed crash on login",
-            "Resolved API timeout",
-            "Dark mode added",
-            "New dashboard screen"
-        ),
-        "Documentation" to listOf("Updated README", "Added API usage guide")
-    )
-
-    RepoScribeTheme {
-        SummaryContent(
-            repoName = "Clog",
-            period = "2025-09-01 - 2025-09-07",
-            commits = 42,
-            contributors = 5,
-            categories = fakeCategories
-        )
     }
 }
+

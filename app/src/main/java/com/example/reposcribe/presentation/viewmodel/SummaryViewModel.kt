@@ -39,10 +39,12 @@ class SummaryViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadCommits(owner: String, repo: String, fetchSummary: Boolean = false) {
         viewModelScope.launch {
+            Log.d("SummaryVM", "loadCommits START for $owner/$repo fetchSummary=$fetchSummary")
             _uiState.value = _uiState.value.copy(isFetchingCommits = true, error = null)
 
             try {
                 val fetchedCommits = getWeeklyCommits(owner, repo)
+                Log.d("SummaryVM", "Fetched commits size=${fetchedCommits.size}")
                 _commits.value = fetchedCommits
                 _uiState.value = _uiState.value.copy(isFetchingCommits = false)
 
@@ -91,8 +93,9 @@ class SummaryViewModel @Inject constructor(
                         )
                     )
                 )
-
+                Log.d("SummaryVM", "Sending prompt: $promptJson")
                 val summary = getRepoSummary(request)
+                Log.d("SummaryVM", "AI summary response: $summary")
 
 //                Save structured JSON back to Room
                 val summaryJson = Gson().toJson(summary)
