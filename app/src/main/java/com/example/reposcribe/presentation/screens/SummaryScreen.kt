@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.reposcribe.presentation.components.SummarySections
 import com.example.reposcribe.presentation.viewmodel.SummaryViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -26,7 +27,7 @@ fun SummaryScreen(
 
     LaunchedEffect(owner, repo) {
         viewModel.loadCommits(owner, repo, true)
-        viewModel.loadSummary("Summarize the weekly activity of repo $repo owned by $owner.")  // call Ai summary
+//        viewModel.loadSummary("Summarize the weekly activity of repo $repo owned by $owner.")  // call Ai summary
     }
 
     Column {
@@ -40,13 +41,13 @@ fun SummaryScreen(
             uiState.isLoading -> Text("Loading...")
             uiState.isFetchingCommits -> Text("Fetching commits, this may take a while.")
             uiState.error != null -> Text("Error: ${uiState.error}")
-            uiState.summary != null -> Text("AI Summary:\n${uiState.summary}")
+            uiState.summary != null -> SummarySections(summary = uiState.summary!!)
         }
-        if(commits.isNotEmpty()) {
-            Text("Commits this week:")
-            commits.forEach { commit ->
-                Text("> ${commit.message}")
-            }
-        }
+//        if(commits.isNotEmpty()) {
+//            Text("Commits this week:")
+//            commits.forEach { commit ->
+//                Text("> ${commit.message}")
+//            }
+//        }
     }
 }

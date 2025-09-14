@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.reposcribe.domain.model.Repo
 import com.example.reposcribe.presentation.components.RepoCard
-import com.example.reposcribe.presentation.uiState.FetchRepoState
+import com.example.reposcribe.presentation.screens.uiState.FetchRepoState
 import com.example.reposcribe.presentation.viewmodel.RepoViewModel
 
 @Composable

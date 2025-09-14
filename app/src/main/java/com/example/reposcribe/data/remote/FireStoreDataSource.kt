@@ -1,5 +1,6 @@
 package com.example.reposcribe.data.remote
 
+import com.example.reposcribe.data.local.Commit
 import com.example.reposcribe.domain.model.ConnectedRepo
 import com.example.reposcribe.domain.model.User
 import com.google.firebase.firestore.FieldValue
@@ -13,6 +14,7 @@ class FireStoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
     private val usersCollection = firestore.collection("users")
+    private val commitsCollection = firestore.collection("commits")
 
     suspend fun getConnectedRepo(userId: String): List<ConnectedRepo> {
         val snapshot = usersCollection
@@ -39,7 +41,7 @@ class FireStoreDataSource @Inject constructor(
         val currentRepos = user?.connectedRepos ?: emptyList()
 
         val toRemove = currentRepos.find { it.repoId == repoId }
-        if(toRemove != null) {
+        if (toRemove != null) {
             usersCollection
                 .document(userId)
                 .update("connectedRepos", FieldValue.arrayRemove(toRemove))
@@ -50,5 +52,51 @@ class FireStoreDataSource @Inject constructor(
     suspend fun isRepoConnected(userId: String, repoId: String): Boolean {
         val repos = getConnectedRepo(userId)
         return repos.any { it.repoId == repoId }
+    }
+
+    suspend fun storeCommits(
+        userId: String,
+        commits: List<Commit>
+    ) {
+        val commitsCollection = firestore.collection("commits")
+            .document(userId)    // repoId as document id
+            .collection("allCommits")
+
+        commits.forEach { commit ->
+            commitsCollection.document(commit.sha)
+                .set(commit)
+                .await()
+        }
+    }
+
+//    suspend fun storeCommits(userId: String, commits: List<com.example.reposcribe.data.local.Commit>) {
+//        commits.forEach { commit ->
+//            commitsCollection
+//                .document(userId)
+//                .collection("userCommits")
+//                .document(commit.sha)
+//                .set(commit)
+//                .await()
+//        }
+//    }
+
+    suspend fun getCommits(userId: String): List<com.example.reposcribe.data.local.Commit> {
+        val snapshot = commitsCollection
+            .document(userId)
+            .collection("userCommits")
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { it.toObject(com.example.reposcribe.data.local.Commit::class.java) }
+    }
+
+    suspend fun clearCommits(userId: String) {
+        val snapshot = commitsCollection
+            .document(userId)
+            .collection("userCommits")
+            .get()
+            .await()
+
+        snapshot.documents.forEach { it.reference.delete().await() }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.reposcribe.presentation.uiState
+package com.example.reposcribe.presentation.screens.uiState
 
 sealed class CommitFetchState {
     object Idle : CommitFetchState()

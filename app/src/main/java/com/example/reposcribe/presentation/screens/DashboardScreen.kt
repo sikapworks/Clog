@@ -34,8 +34,8 @@ import com.example.reposcribe.presentation.components.EmptyState
 import com.example.reposcribe.presentation.components.ErrorState
 import com.example.reposcribe.presentation.components.RepoRow
 import com.example.reposcribe.presentation.components.RepoSkeleton
-import com.example.reposcribe.presentation.uiState.CommitFetchState
-import com.example.reposcribe.presentation.uiState.FetchRepoState
+import com.example.reposcribe.presentation.screens.uiState.CommitFetchState
+import com.example.reposcribe.presentation.screens.uiState.FetchRepoState
 import com.example.reposcribe.presentation.viewmodel.DashboardViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)

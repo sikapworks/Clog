@@ -17,16 +17,16 @@ class GetWeeklyCommitsUseCase @Inject constructor(
     suspend operator fun invoke(
         owner: String,
         name: String,
-//        sinceIso: String,
+        sinceIso: String? = null,
 //        untilIso: String
     ): List<Commit> {
         val formatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC)
 
         val until = Instant.now()
-        val since = until.minus(7, ChronoUnit.DAYS)
+        val since = sinceIso?.let { Instant.parse(it) } ?: until.minus(7, ChronoUnit.DAYS)
 
-        val sinceIso = formatter.format(since)
+        val sinceIsoFinal = formatter.format(since)
         val untilIso = formatter.format(until)
-        return githubRepository.getCommitsForRange(owner, name, sinceIso, untilIso)
+        return githubRepository.getCommitsForRange(owner, name, sinceIsoFinal, untilIso)
     }
 }

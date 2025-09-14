@@ -1,6 +1,8 @@
 package com.example.reposcribe.data.remote.dto
 
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
+
 
 data class RepositoryDto (
     val id: Int,

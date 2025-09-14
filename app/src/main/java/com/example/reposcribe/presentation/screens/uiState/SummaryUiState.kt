@@ -1,4 +1,6 @@
-package com.example.reposcribe.presentation.uiState
+package com.example.reposcribe.presentation.screens.uiState
+
+import com.example.reposcribe.domain.model.PromptResponse
 
 data class SummarySectionUi (
     val title: String,
@@ -15,6 +17,6 @@ data class WeeklySummaryUi (
 data class SummaryUiState(
     val isLoading: Boolean = false,
     val isFetchingCommits: Boolean = false,
-    val summary: String? = null,
+    val summary: PromptResponse? = null,
     val error: String? = null
 )

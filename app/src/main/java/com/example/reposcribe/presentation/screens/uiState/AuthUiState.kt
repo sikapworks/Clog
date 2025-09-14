@@ -1,4 +1,4 @@
-package com.example.reposcribe.presentation.uiState
+package com.example.reposcribe.presentation.screens.uiState
 
 data class AuthUiState(
     val email: String = "",

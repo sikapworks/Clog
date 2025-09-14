@@ -3,12 +3,10 @@ package com.example.reposcribe.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reposcribe.data.remote.dto.RepositoryDto
 import com.example.reposcribe.domain.model.Repo
 import com.example.reposcribe.domain.repository.GithubRepository
-import com.example.reposcribe.presentation.uiState.FetchRepoState
+import com.example.reposcribe.presentation.screens.uiState.FetchRepoState
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RepoViewModel(

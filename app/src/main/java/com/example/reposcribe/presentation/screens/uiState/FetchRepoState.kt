@@ -1,4 +1,4 @@
-package com.example.reposcribe.presentation.uiState
+package com.example.reposcribe.presentation.screens.uiState
 
 sealed class FetchRepoState<out T> {
     object Idle: FetchRepoState<Nothing>()  //initial state

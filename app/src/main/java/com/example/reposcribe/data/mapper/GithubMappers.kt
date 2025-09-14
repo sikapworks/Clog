@@ -34,3 +34,24 @@ fun CommitListItemDto.toDomain(): Commit = Commit(
     authorName = commit.author?.name ?: author?.login,
     dateIso = commit.author?.date
 )
+
+fun Commit.toEntity(owner: String, repoName: String): com.example.reposcribe.data.local.Commit {
+    return com.example.reposcribe.data.local.Commit(
+        sha = this.sha,
+        message = this.message,
+        author = this.authorName,
+        date = this.dateIso ?: "1970-01-01T00:00:00Z",
+        owner = owner,
+        repo = repoName
+    )
+}
+
+fun com.example.reposcribe.data.local.Commit.toDomain(): Commit {
+    return Commit(
+        sha = this.sha,
+        message = this.message,
+        authorName = this.author,
+        dateIso = this.date
+    )
+
+}

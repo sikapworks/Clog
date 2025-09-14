@@ -9,7 +9,7 @@ import com.example.reposcribe.domain.usecase.GetCurrentUserUseCase
 import com.example.reposcribe.domain.usecase.LoginUseCase
 import com.example.reposcribe.domain.usecase.LogoutUseCase
 import com.example.reposcribe.domain.usecase.SignUpUseCase
-import com.example.reposcribe.presentation.uiState.AuthUiState
+import com.example.reposcribe.presentation.screens.uiState.AuthUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

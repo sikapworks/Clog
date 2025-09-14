@@ -19,6 +19,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val apiKey: String = project.findProperty("API_KEY") as String? ?: ""
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"$apiKey\""
+        )
     }
 
     buildTypes {
@@ -38,6 +44,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -82,4 +89,16 @@ dependencies {
 
     // OkHttp (for logging)
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Room components
+    implementation("androidx.room:room-runtime:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+
+    // Kotlin coroutines support for Room
+    implementation("androidx.room:room-ktx:2.7.2")
+
+    //Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("junit:junit:4.13.2")
+
 }

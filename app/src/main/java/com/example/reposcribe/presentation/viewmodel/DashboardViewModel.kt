@@ -1,9 +1,7 @@
 package com.example.reposcribe.presentation.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reposcribe.domain.model.ConnectedRepo
@@ -16,8 +14,8 @@ import com.example.reposcribe.domain.usecase.GetReposUseCase
 import com.example.reposcribe.domain.usecase.GetWeeklyCommitsUseCase
 import com.example.reposcribe.domain.usecase.IsRepoConnectedUseCase
 import com.example.reposcribe.domain.usecase.RemoveConnectedRepoUseCase
-import com.example.reposcribe.presentation.uiState.CommitFetchState
-import com.example.reposcribe.presentation.uiState.FetchRepoState
+import com.example.reposcribe.presentation.screens.uiState.CommitFetchState
+import com.example.reposcribe.presentation.screens.uiState.FetchRepoState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

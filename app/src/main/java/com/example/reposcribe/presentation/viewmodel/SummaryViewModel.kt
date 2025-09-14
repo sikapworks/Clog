@@ -7,19 +7,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reposcribe.domain.model.Commit
 import com.example.reposcribe.domain.model.PromptRequest
+import com.example.reposcribe.domain.model.PromptResponse
+import com.example.reposcribe.domain.repository.CommitRepository
+import com.example.reposcribe.domain.repository.SummaryRepository
 import com.example.reposcribe.domain.usecase.GetRepoSummaryUseCase
 import com.example.reposcribe.domain.usecase.GetWeeklyCommitsUseCase
-import com.example.reposcribe.presentation.uiState.SummaryUiState
+import com.example.reposcribe.domain.utils.builtCommitSummaryPrompt
+import com.example.reposcribe.presentation.screens.uiState.SummaryUiState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class SummaryViewModel @Inject constructor(
     private val getWeeklyCommits: GetWeeklyCommitsUseCase,
-    private val getRepoSummary: GetRepoSummaryUseCase
+    private val getRepoSummary: GetRepoSummaryUseCase,
+    private val commitRepository: CommitRepository,
+    private val summaryRepository: SummaryRepository
 ) : ViewModel() {
 
     private val _commits = MutableStateFlow<List<Commit>>(emptyList())
@@ -28,53 +36,74 @@ class SummaryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SummaryUiState())
     val uiState: StateFlow<SummaryUiState> = _uiState
 
-    private var isCommitsLoaded = false
-
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadCommits(owner: String, repo: String, forceRefresh: Boolean = false) {
+    fun loadCommits(owner: String, repo: String, fetchSummary: Boolean = false) {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isFetchingCommits = true, error = null)
+
             try {
-                _uiState.value = SummaryUiState(isLoading = forceRefresh)
-                Log.d("SummaryVM", "Fetching commits for $owner/$repo")
-                val result = getWeeklyCommits(owner, repo)
-                _commits.value = result
-                isCommitsLoaded = forceRefresh
+                val fetchedCommits = getWeeklyCommits(owner, repo)
+                _commits.value = fetchedCommits
+                _uiState.value = _uiState.value.copy(isFetchingCommits = false)
 
-                _uiState.value = _uiState.value.copy(isLoading = false)
-                Log.d("SummaryVM", "Got ${result.size} commits")
-
+                if (fetchSummary) {
+                    val cached = summaryRepository.getLatestSummary(owner, repo)
+                    if (cached != null) {
+                        val summary =
+                            Gson().fromJson(cached.summaryText, PromptResponse::class.java)
+                        _uiState.value = _uiState.value.copy(summary = summary)
+                    } else {
+                        loadSummary(owner, repo, fetchedCommits)
+                    }
+                }
             } catch (e: Exception) {
-                Log.e("SummaryVM", "Error fetching commits", e)
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+                _uiState.value = _uiState.value.copy(
+                    isFetchingCommits = false,
+                    error = e.message
+                )
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun refresh(owner: String, repo: String) {
-        loadCommits(owner, repo, forceRefresh = true)
-        loadSummary("Summarize weekly activity for repo $repo owned by $owner.")
+        loadCommits(owner, repo, fetchSummary = true)
     }
 
-    fun loadSummary(prompt: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadSummary(owner: String, repo: String, commits: List<Commit>) {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
             try {
-                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+                val (startDate, endDate) = (LocalDate.now().minusDays(6)
+                    .toString() to LocalDate.now().toString())
+                val commitMessages = _commits.value.map { it.message }
+                val promptJson = builtCommitSummaryPrompt(repo, startDate, endDate, commitMessages)
 
                 val request = PromptRequest(
                     contents = listOf(
                         PromptRequest.Content(
                             role = "user",
                             parts = listOf(
-                                PromptRequest.Content.Part(text = prompt)
+                                PromptRequest.Content.Part(text = promptJson)
                             )
                         )
                     )
                 )
-                Log.d("SummaryVM", "Fetching summary with prompt: $prompt")
 
                 val summary = getRepoSummary(request)
-                _uiState.value = _uiState.value.copy(isLoading = false, summary = summary.toString())
+
+//                Save structured JSON back to Room
+                val summaryJson = Gson().toJson(summary)
+                summaryRepository.storeSummary(
+                    owner = owner,
+                    repo = repo,
+                    summaryText = summaryJson,
+                    generatedAt = System.currentTimeMillis()
+                )
+
+                _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
 
             } catch (e: Exception) {
                 Log.e("SummaryVM", "Error fetching summary", e)
