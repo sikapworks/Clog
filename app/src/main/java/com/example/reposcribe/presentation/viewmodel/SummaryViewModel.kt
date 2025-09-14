@@ -58,6 +58,7 @@ class SummaryViewModel @Inject constructor(
                         loadSummary(owner, repo, fetchedCommits)
                     }
                 }
+
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isFetchingCommits = false,
