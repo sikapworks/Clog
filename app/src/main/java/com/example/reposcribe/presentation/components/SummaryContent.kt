@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,14 +93,16 @@ fun SummaryContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onShareClick,
-//                colors = ButtonDefaults.buttonColors(Color(0xFFFFC107))
+                    elevation = ButtonDefaults.buttonElevation(6.dp),
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("Share Summary")
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onExportClick,
-//                colors = ButtonDefaults.buttonColors(Color(0xFF673AB7))
+                    elevation = ButtonDefaults.buttonElevation(6.dp),
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("Export PDF")
                 }

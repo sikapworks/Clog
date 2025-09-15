@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun SummaryInfoCard(period: String, commits: Int, contributors: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             InfoItem("Period", period, Icons.Default.DateRange)

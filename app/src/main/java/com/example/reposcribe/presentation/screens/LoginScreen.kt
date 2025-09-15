@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -96,7 +97,8 @@ fun LoginScreen(
                 onClick = { viewModel.doLogin() },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.loading,
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                elevation = ButtonDefaults.buttonElevation(6.dp),
             ) {
                 Text(if (state.loading) "Logging in..." else "Login")
             }

@@ -11,10 +11,10 @@ import retrofit2.http.Query
 interface AiApiService {
 
     @Headers("Content-Type: application/json")
-    @POST("v1beta/models/{model}:generateContent")
+    @POST("v1beta/models/{model}:generateContent")  // hits api endpoint
     suspend fun getSummary(
         @Path("model") model: String,
         @Query("key") apiKey: String,
-        @Body request: AiSummaryRequest,
+        @Body request: AiSummaryRequest,   // commit logs as part of request
     ): AiSummaryResponse
 }

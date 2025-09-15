@@ -31,7 +31,7 @@ class CommitRepository @Inject constructor(
         repoName: String,
         userId: String
     ): List<com.example.reposcribe.domain.model.Commit> {
-        val local = commitDao.getCommits(owner, repoName).map { it.toDomain() }
+        val local = commitDao.getAllCommits(owner, repoName).map { it.toDomain() }
 
         return if (local.isNotEmpty()) local
         else firestore.getCommits(userId).map { it.toDomain() }

@@ -15,12 +15,11 @@ fun RepositoryDto.toDomain(): Repo = Repo(
     name = name,
     language = language,
     htmlUrl = htmlUrl,
-//    updatedIso = null  // you can extend DTO later to include pushed_at if needed
     updatedIso = pushedAt?.let { isoString ->
-//        isoString.substring(0, 10)  // Date format: 16 Aug 2025
         try {
+            //parse to human readable format
             val parsed = ZonedDateTime.parse(isoString, DateTimeFormatter.ISO_OFFSET_DATE)
-            parsed.format(DateTimeFormatter.ofPattern("dd MM yyyy"))//16 Aug 202516 Aug 2025, 10:30 AM
+            parsed.format(DateTimeFormatter.ofPattern("dd MM yyyy"))//16 Aug 2025
         }
         catch (e: Exception) {
             isoString //fallback to raw string
@@ -28,6 +27,7 @@ fun RepositoryDto.toDomain(): Repo = Repo(
     }
 )
 
+// convert API commit DTO to domain commit
 fun CommitListItemDto.toDomain(): Commit = Commit(
     sha = sha,
     message = commit.message,
@@ -35,6 +35,7 @@ fun CommitListItemDto.toDomain(): Commit = Commit(
     dateIso = commit.author?.date
 )
 
+// convert domain -> DB entity
 fun Commit.toEntity(owner: String, repoName: String): com.example.reposcribe.data.local.Commit {
     return com.example.reposcribe.data.local.Commit(
         sha = this.sha,
@@ -46,6 +47,7 @@ fun Commit.toEntity(owner: String, repoName: String): com.example.reposcribe.dat
     )
 }
 
+// convert DB entity -> domain
 fun com.example.reposcribe.data.local.Commit.toDomain(): Commit {
     return Commit(
         sha = this.sha,
