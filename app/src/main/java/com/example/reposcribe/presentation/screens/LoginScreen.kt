@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,7 +75,7 @@ fun LoginScreen(
             AppTextField(
                 value = state.email,
                 onValueChange = viewModel::onEmailChanged,
-                label = "Email",
+                placeholder = "Email",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -82,9 +84,10 @@ fun LoginScreen(
             AppTextField(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChanged,
-                label = "Password",
+                placeholder = "Password",
                 modifier = Modifier.fillMaxWidth(),
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password
             )
             Spacer(Modifier.height(16.dp))
 
@@ -92,7 +95,8 @@ fun LoginScreen(
             Button(
                 onClick = { viewModel.doLogin() },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.loading
+                enabled = !state.loading,
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(if (state.loading) "Logging in..." else "Login")
             }
