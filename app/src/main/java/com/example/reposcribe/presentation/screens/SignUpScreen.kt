@@ -1,12 +1,20 @@
 package com.example.reposcribe.presentation.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.reposcribe.presentation.components.AppTextField
@@ -23,6 +32,7 @@ import com.example.reposcribe.presentation.viewmodel.AuthViewModel
 @Composable
 fun SignUpScreen(
     viewModel: AuthViewModel = hiltViewModel(),
+    onGoToLogin: () -> Unit,
     onSuccess: () -> Unit,
 ) {
     val state = viewModel.uiState
@@ -30,14 +40,27 @@ fun SignUpScreen(
     if (state.success) {
         LaunchedEffect(Unit) { onSuccess() }
     }
+    val scrollableState = rememberScrollState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+    ) {
         Column(
             modifier = Modifier
                 .padding(20.dp)
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                .scrollable(
+                    state = scrollableState,
+                    orientation = Orientation.Vertical
+                ),
         ) {
-            Text(text = "Create account", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Create Account",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Spacer(Modifier.height(16.dp))
 
             // Email
@@ -75,6 +98,28 @@ fun SignUpScreen(
                 enabled = !state.loading
             ) {
                 Text(if (state.loading) "Creating..." else "Sign up")
+            }
+
+            Spacer(Modifier.height(8.dp))
+            //Login
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Already have an account? ",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium
+
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    "Login",
+                    modifier = Modifier.clickable(onClick = onGoToLogin),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textDecoration = TextDecoration.Underline,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             //show error message if present

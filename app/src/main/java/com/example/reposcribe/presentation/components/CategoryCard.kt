@@ -30,11 +30,10 @@ import com.google.firebase.annotations.PreviewApi
 fun CategoryCard(category: String, items: List<String>) {
 
     var expanded by remember { mutableStateOf(false) }
-    val visibleItems = if (expanded) items else items.take(2)
+    val visibleItems = if (expanded) items else items.take(1)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-//        colors = CardDefaults.cardColors(containerColor = Color(0xFF8D6E63))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -45,7 +44,6 @@ fun CategoryCard(category: String, items: List<String>) {
                 Text(
                     text = category,
                     style = MaterialTheme.typography.titleMedium,
-//                    color = Color.Yellow,
                     fontWeight = FontWeight.Bold
                 )
                 Badge() {
@@ -56,7 +54,7 @@ fun CategoryCard(category: String, items: List<String>) {
             Spacer(Modifier.height(8.dp))
 
             visibleItems.forEach { item ->
-                Text("• $item", color = Color.White)
+                Text("• $item")
             }
 
             if (items.size > 2) {

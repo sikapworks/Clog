@@ -3,14 +3,17 @@ package com.example.reposcribe.presentation.screens
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +39,7 @@ fun SummaryScreen(
     val commits by viewModel.commits.collectAsState()
 
     // trigger load once when opened
-    LaunchedEffect(owner, repo) {
+    LaunchedEffect(Unit) {
         viewModel.loadCommits(owner, repo, fetchSummary = true)
     }
 
@@ -51,12 +54,15 @@ fun SummaryScreen(
 
     // UI rendering: if a summary exists show it; else friendly empty state
     Column(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
         ) {
         when {
-            uiState.isLoading || uiState.isFetchingCommits -> Text("Loading...")
+            uiState.isLoading || uiState.isFetchingCommits -> Text(text = "Loading...", color = MaterialTheme.colorScheme.error)
             uiState.error != null -> Text("Error: ${uiState.error}")
             uiState.summary != null -> {
                 SummaryContent(
@@ -64,16 +70,15 @@ fun SummaryScreen(
                     period = uiState.period,
                     commits = uiState.commitsCount,
                     contributors = uiState.contributorsCount,
-                    categories = categories
+                    categories = categories,
+                    onRefreshClick = { viewModel.refresh(owner, repo) }
                 )
             }
 
             else -> {
-//            Column {
                 Text("No summary available yet. Tap Refresh to generate.")
                 Button(onClick = { viewModel.refresh(owner, repo) }) {
                     Text("Refresh")
-//                }
                 }
             }
         }

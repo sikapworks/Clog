@@ -1,16 +1,19 @@
 package com.example.reposcribe.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,7 +51,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-//            .background(color = MaterialTheme.colorScheme.onPrimary)
+            .background(color = MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -61,8 +65,8 @@ fun LoginScreen(
             Text(
                 "Welcome back!",
                 style = MaterialTheme.typography.headlineSmall,
-//                color = MaterialTheme.colorScheme.onSurface
-                )
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Spacer(Modifier.height(16.dp))
 
             // Email
@@ -92,16 +96,25 @@ fun LoginScreen(
             ) {
                 Text(if (state.loading) "Logging in..." else "Login")
             }
-
-            //SignUpScreen Nav Button
-            Button(
-                onClick = onGoToSignup,
-                modifier = Modifier
-//            .align(Alignment.End)
-                    .fillMaxWidth()
-
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text("Create Account")
+                Text(
+                    "Don't have an account? ",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium
+
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    "Create Account",
+                    modifier = Modifier.clickable(onClick = onGoToSignup),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textDecoration = TextDecoration.Underline,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             state.error?.let {
                 Spacer(Modifier.height(8.dp))

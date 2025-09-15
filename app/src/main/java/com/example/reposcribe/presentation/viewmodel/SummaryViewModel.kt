@@ -50,24 +50,26 @@ class SummaryViewModel @Inject constructor(
                 val weekAgo = now.minusDays(6)
                 val filtered = fetchedCommits.filter { commit ->
                     commit.dateIso?.let { LocalDate.parse(it.substring(0, 10)) }
-                        ?.isAfter(weekAgo.minusDays(1)) ?: false
+                        ?.let { date -> !date.isBefore(weekAgo) && !date.isAfter(now) } ?: false
                 }   // understanddd this
 
                 _commits.value = filtered
+//                _commits.value = fetchedCommits
                 updateDerivedState(filtered, _uiState.value.summary)
 
                 _uiState.value = _uiState.value.copy(isFetchingCommits = false)
 
                 if (fetchSummary) {
-                    val cached = summaryRepository.getLatestSummary(owner, repo)
-                    if (cached != null) {
-                        val summary =
-                            Gson().fromJson(cached.summaryText, PromptResponse::class.java)
-                        _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
-                        updateDerivedState(filtered, summary)
-                    } else {
+//                    val cached = summaryRepository.getLatestSummary(owner, repo)
+//                    if (cached != null) {
+//                        val summary =
+//                            Gson().fromJson(cached.summaryText, PromptResponse::class.java)
+//                        _uiState.value = _uiState.value.copy(isLoading = false, summary = summary)
+//                        updateDerivedState(filtered, summary)
+//                    } else {
                         loadSummary(owner, repo, fetchedCommits)
-                    }
+                    Log.d("SummaryVM", "loadSummary START for $owner/$repo ")
+//                    }
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -93,7 +95,7 @@ class SummaryViewModel @Inject constructor(
             try {
                 val (startDate, endDate) = (LocalDate.now().minusDays(6)
                     .toString() to LocalDate.now().toString())
-                val commitMessages = _commits.value.map { it.message }
+                val commitMessages = commits.map { it.message }
                 val promptJson = builtCommitSummaryPrompt(repo, startDate, endDate, commitMessages)
 
                 Log.d("SummaryVM", "Prompt JSON: ${promptJson.take(1000)}")
@@ -139,9 +141,11 @@ class SummaryViewModel @Inject constructor(
         val contributorsCount =
             commits.mapNotNull { it.authorName?.takeIf { it.isNotBlank() } }.toSet().size
 
-        val commitsCount = summary?.let {
-            it.newFeatures.size + it.improvements.size + it.bugFixes.size + it.documentation.size
-        } ?: 0
+//        val commitsCount = summary?.let {
+//            it.newFeatures.size + it.improvements.size + it.bugFixes.size + it.documentation.size
+//        } ?: 0
+
+        val commitsCount = commits.size
 
         _uiState.value = _uiState.value.copy(
             period = period,

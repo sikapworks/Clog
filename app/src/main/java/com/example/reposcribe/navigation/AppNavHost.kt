@@ -47,6 +47,7 @@ fun AppNavHost(
                         }
                     }
                 },
+                onGoToLogin = { navController.navigate("login") }
             )
         }
 
