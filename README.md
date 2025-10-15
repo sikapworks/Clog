@@ -43,6 +43,13 @@ It automates a previously manual reporting task, saving developers time and maki
 - Firebase project setup (optional, for auth/storage)  
 
 ### Setup  
-1. Clone this repo
-2. Add your API keys
+1. Clone the repo:  
+   ```bash
+   git clone https://github.com/your-username/clog.git
+   cd clog
+
+2. Add Firebase configuration:
+   ```bash
+   Place google-services.json in the app/ folder
+
 3. Sync and run in Android Studio
